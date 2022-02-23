@@ -1,11 +1,13 @@
 package com.chat.reactchat.service;
 
 import com.chat.reactchat.configuration.jwt.JwtTokenUtils;
-import com.chat.reactchat.enums.Role;
+import com.chat.reactchat.model.ChatMessage;
+import com.chat.reactchat.model.ChatRoom;
+import com.chat.reactchat.model.Role;
 import com.chat.reactchat.model.User;
-import com.chat.reactchat.pojo.auth.LoginRequest;
-import com.chat.reactchat.pojo.auth.LoginResponse;
-import com.chat.reactchat.pojo.auth.RegistrationRequest;
+import com.chat.reactchat.dto.auth.LoginRequest;
+import com.chat.reactchat.dto.auth.LoginResponse;
+import com.chat.reactchat.dto.auth.RegistrationRequest;
 import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 

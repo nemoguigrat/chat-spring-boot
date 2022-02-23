@@ -1,17 +1,18 @@
 package com.chat.reactchat.model;
 
-import com.chat.reactchat.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
@@ -47,8 +48,11 @@ public class User {
     private Set<ChatRoom> rooms = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "sender")
-    private Set<ChatMessage> messages;
+    @OneToMany(mappedBy = "sender", cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    private Set<ChatMessage> messages = new HashSet<>();
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
@@ -66,4 +70,9 @@ public class User {
         this.rooms.add(room);
         room.getUsers().add(this);
     }
+
+    public void addMessage(ChatMessage message){
+        messages.add(message);
+    }
+
 }

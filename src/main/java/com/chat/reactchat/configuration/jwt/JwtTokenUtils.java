@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
@@ -19,7 +20,7 @@ public class JwtTokenUtils {
     private String jwtSecret;
 
     @Value("${jwt.lifetime}")
-    private int jwtLifetime;
+    private long jwtLifetime;
 
     private SecretKeySpec key;
 
@@ -50,6 +51,13 @@ public class JwtTokenUtils {
 
     public String getUserNameFromJwtToken(String jwt) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody().getSubject();
+    }
+
+    public String getToken(String rawToken){
+        if (StringUtils.hasText(rawToken) && rawToken.startsWith("Bearer ")) {
+            return rawToken.substring(7);
+        }
+        return null;
     }
 
 }

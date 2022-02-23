@@ -1,6 +1,6 @@
-package com.chat.reactchat.pojo.auth;
+package com.chat.reactchat.dto.auth;
 
-import com.chat.reactchat.enums.Role;
+import com.chat.reactchat.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

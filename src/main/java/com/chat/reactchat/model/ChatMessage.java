@@ -1,12 +1,15 @@
 package com.chat.reactchat.model;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "messages")
 @NoArgsConstructor
 public class ChatMessage {
@@ -22,4 +25,10 @@ public class ChatMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom room;
+
+    public ChatMessage(String message, User sender, ChatRoom room){
+        this.message = message;
+        this.sender = sender;
+        this.room = room;
+    }
 }

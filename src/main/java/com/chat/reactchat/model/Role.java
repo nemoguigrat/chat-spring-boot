@@ -1,4 +1,4 @@
-package com.chat.reactchat.enums;
+package com.chat.reactchat.model;
 
 import org.springframework.security.core.GrantedAuthority;
 

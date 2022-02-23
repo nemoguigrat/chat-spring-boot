@@ -1,9 +1,9 @@
 package com.chat.reactchat.controller;
 
 import com.chat.reactchat.model.User;
-import com.chat.reactchat.pojo.auth.LoginRequest;
-import com.chat.reactchat.pojo.auth.LoginResponse;
-import com.chat.reactchat.pojo.auth.RegistrationRequest;
+import com.chat.reactchat.dto.auth.LoginRequest;
+import com.chat.reactchat.dto.auth.LoginResponse;
+import com.chat.reactchat.dto.auth.RegistrationRequest;
 import com.chat.reactchat.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
-package com.chat.reactchat.pojo.room;
+package com.chat.reactchat.dto.room;
 
-import com.chat.reactchat.enums.RoomType;
+import com.chat.reactchat.model.RoomType;
 import lombok.Data;
 
 import javax.persistence.EnumType;

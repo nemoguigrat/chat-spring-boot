@@ -1,6 +1,5 @@
 package com.chat.reactchat.model;
 
-import com.chat.reactchat.enums.RoomType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -29,6 +28,9 @@ public class ChatRoom {
     @ManyToMany(mappedBy = "rooms")
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "room", cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
     private Set<ChatMessage> messages = new HashSet<>();
 }

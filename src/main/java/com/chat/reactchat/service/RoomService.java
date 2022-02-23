@@ -1,6 +1,6 @@
 package com.chat.reactchat.service;
 
-import com.chat.reactchat.enums.RoomType;
+import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.repository.MessageRepository;
@@ -18,18 +18,18 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
 
-    public ChatRoom addPersonalRoom(User user, String name){
+    public ChatRoom addPersonalRoom(User user, String name) {
         return new ChatRoom();
     }
 
-    public ChatRoom addUsersToRoom(Long chatId, Set<User> users){
+    public ChatRoom addUsersToRoom(Long chatId, Set<User> users) {
         ChatRoom room = findRoomById(chatId);
         users.forEach(x -> x.addUserInRoom(room));
         userRepository.saveAll(users);
         return room;
     }
 
-    public ChatRoom addCommunityRoom(User user, String name){
+    public ChatRoom addCommunityRoom(User user, String name) {
         ChatRoom room = addRoom(name);
         room.setRoomType(RoomType.COMMUNITY);
         user.addUserInRoom(room);
@@ -37,13 +37,13 @@ public class RoomService {
         return room;
     }
 
-    public ChatRoom addRoom(String name){
+    public ChatRoom addRoom(String name) {
         ChatRoom room = new ChatRoom();
         room.setName(name);
         return room;
     }
 
-    public ChatRoom findRoomById(Long roomId){
+    public ChatRoom findRoomById(Long roomId) {
         return roomRepository.findChatRoomById(roomId);
     }
 }

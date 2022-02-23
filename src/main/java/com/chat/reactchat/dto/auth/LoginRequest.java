@@ -1,4 +1,4 @@
-package com.chat.reactchat.pojo.auth;
+package com.chat.reactchat.dto.auth;
 
 import lombok.Data;
 
