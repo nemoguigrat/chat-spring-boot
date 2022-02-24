@@ -20,6 +20,7 @@ public class ChatService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
 
+    // сохранение в отдельной транзакции, так как сообщения пользователя подгружаются лениво
     @Transactional
     public ChatMessage saveMessage(String email, Long roomId, String text) {
         User user = userRepository.findUserByEmail(email).get();
@@ -28,10 +29,5 @@ public class ChatService {
         user.getMessages().add(message);
         userRepository.save(user);
         return message;
-    }
-
-    @Transactional
-    public Set<User> usersInChatRoom(ChatMessage message) {
-        return new HashSet<>(message.getRoom().getUsers());
     }
 }

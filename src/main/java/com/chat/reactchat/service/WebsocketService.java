@@ -23,7 +23,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @AllArgsConstructor
 public class WebsocketService {
     private final ChatService chatService;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -31,17 +30,22 @@ public class WebsocketService {
 
     public void sendMessage(WebSocketSession session, TextMessage message) throws IOException {
         TextMessageDto messageData = objectMapper.readValue(message.getPayload(), TextMessageDto.class);
-
+        //TODO исправить Dto для отправки сообщений
         if (messageData.getRoom() != null && messageData.getMessage() != null) {
             ChatMessage savedMessage = chatService.saveMessage(session.getPrincipal().getName(),
                     messageData.getRoom(), messageData.getMessage());
-            ChatRoom currentRoom = savedMessage.getRoom();
-            Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(currentRoom);
+
+            // получает пользователей из указанной комнаты
+            Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
+
+            // пробегается по всем сессиям(? пока не придумал как сделать эффективнее)
             for (WebSocketSession webSocketSession : sessions) {
-                if (!session.equals(webSocketSession)){
-                    if (usersInCurrentRoom.contains(savedMessage.getSender()))
-                        webSocketSession.sendMessage(message);
-                } // отправить тем пользователям, которые содержаться в комнате currentRoom
+
+                // если это не та же самая сессия и пользователь участник группы, то отправляется сообщение
+                if (!session.equals(webSocketSession) && usersInCurrentRoom.contains(savedMessage.getSender())){
+                // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
+                    webSocketSession.sendMessage(message); // пока только пересылка отправленного
+                }
             }
         }
     }
