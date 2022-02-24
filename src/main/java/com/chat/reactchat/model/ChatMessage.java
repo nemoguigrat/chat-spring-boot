@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -25,6 +26,13 @@ public class ChatMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom room;
+
+    private LocalDateTime dateOfCreation;
+
+    @PrePersist
+    private void init() {
+        dateOfCreation = LocalDateTime.now();
+    }
 
     public ChatMessage(String message, User sender, ChatRoom room){
         this.message = message;

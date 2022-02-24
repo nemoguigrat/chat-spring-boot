@@ -1,10 +1,7 @@
 package com.chat.reactchat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -13,6 +10,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
@@ -36,6 +34,7 @@ public class User {
     @Column(name = "is_active")
     private Boolean active;
 
+    @EqualsAndHashCode.Exclude
     @Column(name = "rooms")
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
@@ -47,6 +46,7 @@ public class User {
     )
     private Set<ChatRoom> rooms = new HashSet<>();
 
+    @EqualsAndHashCode.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "sender", cascade = {
             CascadeType.PERSIST,
@@ -70,9 +70,4 @@ public class User {
         this.rooms.add(room);
         room.getUsers().add(this);
     }
-
-    public void addMessage(ChatMessage message){
-        messages.add(message);
-    }
-
 }

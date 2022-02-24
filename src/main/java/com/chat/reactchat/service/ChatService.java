@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -20,11 +21,17 @@ public class ChatService {
     private final RoomRepository roomRepository;
 
     @Transactional
-    public void saveMessage(String email, Long roomId, String text){
+    public ChatMessage saveMessage(String email, Long roomId, String text) {
         User user = userRepository.findUserByEmail(email).get();
         ChatRoom chatRoom = roomRepository.findById(roomId).get();
         ChatMessage message = new ChatMessage(text, user, chatRoom);
         user.getMessages().add(message);
         userRepository.save(user);
+        return message;
+    }
+
+    @Transactional
+    public Set<User> usersInChatRoom(ChatMessage message) {
+        return new HashSet<>(message.getRoom().getUsers());
     }
 }

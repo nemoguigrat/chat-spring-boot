@@ -16,26 +16,32 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @AllArgsConstructor
 public class WebsocketService {
     private final ChatService chatService;
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public void sendMessage(WebSocketSession session, TextMessage message) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        TextMessageDto messageData = mapper.readValue(message.getPayload(), TextMessageDto.class);
+        TextMessageDto messageData = objectMapper.readValue(message.getPayload(), TextMessageDto.class);
 
         if (messageData.getRoom() != null && messageData.getMessage() != null) {
-            chatService.saveMessage(session.getPrincipal().getName(),
+            ChatMessage savedMessage = chatService.saveMessage(session.getPrincipal().getName(),
                     messageData.getRoom(), messageData.getMessage());
-
+            ChatRoom currentRoom = savedMessage.getRoom();
+            Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(currentRoom);
             for (WebSocketSession webSocketSession : sessions) {
-                if (!session.equals(webSocketSession))
-                    webSocketSession.sendMessage(message);
+                if (!session.equals(webSocketSession)){
+                    if (usersInCurrentRoom.contains(savedMessage.getSender()))
+                        webSocketSession.sendMessage(message);
+                } // отправить тем пользователям, которые содержаться в комнате currentRoom
             }
         }
     }
