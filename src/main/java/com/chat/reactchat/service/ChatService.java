@@ -23,6 +23,7 @@ public class ChatService {
     // сохранение в отдельной транзакции, так как сообщения пользователя подгружаются лениво
     @Transactional
     public ChatMessage saveMessage(String email, Long roomId, String text) {
+        // валидировать участик комнаты этот пользователь или нет
         User user = userRepository.findUserByEmail(email).get();
         ChatRoom chatRoom = roomRepository.findById(roomId).get();
         ChatMessage message = new ChatMessage(text, user, chatRoom);

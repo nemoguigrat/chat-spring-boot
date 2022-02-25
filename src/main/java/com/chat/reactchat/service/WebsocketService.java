@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class WebsocketService {
     private final ChatService chatService;
     private final UserRepository userRepository;
-    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    private final Map<User, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -34,29 +34,28 @@ public class WebsocketService {
         if (messageData.getRoom() != null && messageData.getMessage() != null) {
             ChatMessage savedMessage = chatService.saveMessage(session.getPrincipal().getName(),
                     messageData.getRoom(), messageData.getMessage());
-
             // получает пользователей из указанной комнаты
             Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
 
-            // пробегается по всем сессиям(? пока не придумал как сделать эффективнее)
-            for (WebSocketSession webSocketSession : sessions) {
-
+            // пробегается по пользователям из комнаты и вытаскивает их сессии
+            for (User user : usersInCurrentRoom) {
+                WebSocketSession userSession = sessions.getOrDefault(user, null);
                 // если это не та же самая сессия и пользователь участник группы, то отправляется сообщение
-                if (!session.equals(webSocketSession) && usersInCurrentRoom.contains(savedMessage.getSender())){
-                // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
-                    webSocketSession.sendMessage(message); // пока только пересылка отправленного
+                if (userSession != null && !session.equals(userSession)){
+                    // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
+                    userSession.sendMessage(message); // пока только пересылка отправленного
                 }
             }
         }
     }
 
     public void addSession(WebSocketSession session) {
-        sessions.add(session);
+        // сопоставляет пользователя и сессию, что бы не лазить в базу в лишний раз
+        User user = userRepository.findUserByEmail(session.getPrincipal().getName()).get();
+        sessions.put(user, session);
     }
 
     public void removeSession(WebSocketSession session) {
         sessions.remove(session);
     }
-
-
 }
