@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class ChatService {
+public class MessageService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
 

@@ -5,11 +5,11 @@ import lombok.Data;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.Set;
 
 @Data
 public class CreateRoomRequest {
     private String name;
-
-    @Enumerated(EnumType.STRING)
+    private Set<Long> users;
     private RoomType roomType;
 }

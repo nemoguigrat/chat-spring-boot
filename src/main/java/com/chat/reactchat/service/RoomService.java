@@ -1,5 +1,6 @@
 package com.chat.reactchat.service;
 
+import com.chat.reactchat.dto.room.CreateRoomRequest;
 import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
@@ -18,28 +19,25 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
 
-    public ChatRoom addPersonalRoom(User user, String name) {
-        return new ChatRoom();
+    public ChatRoom inviteUsers(Long chatId, Set<Long> usersId) {
+        ChatRoom room = findRoomById(chatId);
+        if (room.getRoomType() == RoomType.PERSONAL)
+            throw new IllegalArgumentException(); // выкинуть ошибку
+
+        return addUsers(room, usersId);
     }
 
-    public ChatRoom addUsersToRoom(Long chatId, Set<User> users) {
-        ChatRoom room = findRoomById(chatId);
+    public ChatRoom addRoom(String email, CreateRoomRequest request) {
+        ChatRoom room = new ChatRoom();
+        room.setName(request.getName());
+        room.setRoomType(request.getRoomType());
+        return addUsers(room, request.getUsers());
+    }
+
+    private ChatRoom addUsers(ChatRoom room, Set<Long> usersId){
+        Set<User> users = userRepository.findUsersByIdIn(usersId);
         users.forEach(x -> x.addUserInRoom(room));
         userRepository.saveAll(users);
-        return room;
-    }
-
-    public ChatRoom addCommunityRoom(User user, String name) {
-        ChatRoom room = addRoom(name);
-        room.setRoomType(RoomType.COMMUNITY);
-        user.addUserInRoom(room);
-        userRepository.save(user);
-        return room;
-    }
-
-    public ChatRoom addRoom(String name) {
-        ChatRoom room = new ChatRoom();
-        room.setName(name);
         return room;
     }
 

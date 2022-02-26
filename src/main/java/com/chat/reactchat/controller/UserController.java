@@ -20,11 +20,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> signInUser(@RequestBody LoginRequest request) {
-        log.info("Try to signin user " + request.getEmail());
-        LoginResponse response = userService.signIn(request);
-        log.info("User log IN");
-        return ResponseEntity.ok(response);
+    public LoginResponse signInUser(@RequestBody LoginRequest request) {
+        return userService.signIn(request);
     }
 
     @PostMapping("/registration")
@@ -34,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<User> getCurrentUser(Principal principal) {
-        return ResponseEntity.ok(userService.findByEmail(principal.getName()));
+    public User getCurrentUser(Principal principal) {
+        return userService.findByEmail(principal.getName());
     }
 }

@@ -28,6 +28,7 @@ public class ChatRoom {
     @ManyToMany(mappedBy = "rooms")
     private Set<User> users = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE

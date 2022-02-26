@@ -2,27 +2,23 @@ package com.chat.reactchat.service;
 
 import com.chat.reactchat.dto.TextMessageDto;
 import com.chat.reactchat.model.ChatMessage;
-import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
-import com.chat.reactchat.repository.MessageRepository;
-import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 @AllArgsConstructor
 public class WebsocketService {
-    private final ChatService chatService;
+    private final MessageService messageService;
     private final UserRepository userRepository;
     private final Map<User, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -32,7 +28,7 @@ public class WebsocketService {
         TextMessageDto messageData = objectMapper.readValue(message.getPayload(), TextMessageDto.class);
         //TODO исправить Dto для отправки сообщений
         if (messageData.getRoom() != null && messageData.getMessage() != null) {
-            ChatMessage savedMessage = chatService.saveMessage(session.getPrincipal().getName(),
+            ChatMessage savedMessage = messageService.saveMessage(session.getPrincipal().getName(),
                     messageData.getRoom(), messageData.getMessage());
             // получает пользователей из указанной комнаты
             Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
@@ -56,6 +52,6 @@ public class WebsocketService {
     }
 
     public void removeSession(WebSocketSession session) {
-        sessions.remove(session);
+        sessions.entrySet().removeIf(set -> set.getValue().equals(session));
     }
 }
