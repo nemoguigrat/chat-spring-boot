@@ -63,8 +63,4 @@ public class UserService {
         return userRepository.findUserByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("Пользователь: " + email + " не найден."));
     }
-
-    public Set<User> findUserInCollection(Set<Long> usersId){
-        return userRepository.findUsersByIdIn(usersId);
-    }
 }

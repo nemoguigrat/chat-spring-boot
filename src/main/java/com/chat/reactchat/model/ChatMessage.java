@@ -1,6 +1,5 @@
 package com.chat.reactchat.model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,11 +26,11 @@ public class ChatMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom room;
 
-    private LocalDateTime dateOfCreation;
+    private LocalDateTime dateCreation;
 
     @PrePersist
     private void init() {
-        dateOfCreation = LocalDateTime.now();
+        dateCreation = LocalDateTime.now();
     }
 
     public ChatMessage(String message, User sender, ChatRoom room){

@@ -33,7 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling();
         http.authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/chat/**").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),
                 UsernamePasswordAuthenticationFilter.class);
