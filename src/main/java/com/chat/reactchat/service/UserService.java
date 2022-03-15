@@ -25,16 +25,14 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
 
     public LoginResponse signIn(LoginRequest request){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        UserDetails principal = (UserDetails) authentication.getPrincipal();
-        User user = findByEmail(principal.getUsername());
-        String token = jwtTokenUtils.generateJwtToken(user.getEmail());
+        User user = userRepository.findUserByEmailOrThrow(request.getEmail());
+        String token = jwtTokenUtils.generateJwtToken(user.getId());
         return new LoginResponse(
                 user.getEmail(),
                 user.getFirstName(),
@@ -59,8 +57,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User findByEmail(String email){
-        return userRepository.findUserByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("Пользователь: " + email + " не найден."));
+    public User findById(Long id){
+        return userRepository.findById(id).orElseThrow(() ->
+                new UsernameNotFoundException("Пользователь: " + id + " не найден."));
     }
 }

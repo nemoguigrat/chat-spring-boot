@@ -5,6 +5,7 @@ import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.repository.UserRepository;
+import com.chat.reactchat.service.util.JsonConverterUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,41 +22,28 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebsocketService {
     private final MessageService messageService;
     private final UserRepository userRepository;
-    private final Map<User, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final WebsocketSessionStoreService sessionStore;
+    private final JsonConverterUtil jsonConverterUtil;
 
 
     public void sendMessage(WebSocketSession session, TextMessage message) throws IOException {
-        TextMessageRequest messageRequest = objectMapper.readValue(message.getPayload(), TextMessageRequest.class);
-        //TODO исправить Dto для отправки сообщений
-        if (messageRequest.getRoom() != null && messageRequest.getMessage() != null) {
+            TextMessageRequest messageRequest = jsonConverterUtil.parseTextMessage(message);
             ChatMessage savedMessage = messageService.saveMessage(session.getPrincipal().getName(),
                     messageRequest.getRoom(), messageRequest.getMessage());
             // получает пользователей из указанной комнаты
             Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
 
             //генеригует сообщение для отправки другим пользователям
-            TextMessage messageResponse = new TextMessage(new TextMessageResponse(savedMessage).toString());
+            TextMessage messageResponse = new TextMessage(jsonConverterUtil.convert(savedMessage));
 
             // пробегается по пользователям из комнаты и вытаскивает их сессии
             for (User user : usersInCurrentRoom) {
-                WebSocketSession userSession = sessions.getOrDefault(user, null);
+                WebSocketSession userSession = sessionStore.getSession(user);
                 // если это не та же самая сессия и пользователь участник группы, то отправляется сообщение
                 if (userSession != null && !session.equals(userSession)){
                     // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
                     userSession.sendMessage(messageResponse); // пока только пересылка отправленного
                 }
             }
-        }
-    }
-
-    public void addSession(WebSocketSession session) {
-        // сопоставляет пользователя и сессию, что бы не лазить в базу в лишний раз
-        User user = userRepository.findUserByEmail(session.getPrincipal().getName()).get();
-        sessions.put(user, session);
-    }
-
-    public void removeSession(WebSocketSession session) {
-        sessions.entrySet().removeIf(set -> set.getValue().equals(session));
     }
 }

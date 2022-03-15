@@ -8,6 +8,7 @@ import java.util.Collection;
 
 @Data
 public class CustomUserDetails implements UserDetails {
+    private Long id;
     private String email;
     private String password;
     private Boolean active;
@@ -15,6 +16,7 @@ public class CustomUserDetails implements UserDetails {
 
     public static CustomUserDetails fromUserEntityToCustomUserDetails(User userEntity) {
         CustomUserDetails customUserDetails = new CustomUserDetails();
+        customUserDetails.setId(userEntity.getId());
         customUserDetails.setEmail(userEntity.getEmail());
         customUserDetails.setPassword(userEntity.getPassword());
         customUserDetails.setActive(userEntity.getActive());
@@ -34,7 +36,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return id.toString();
     }
 
     @Override

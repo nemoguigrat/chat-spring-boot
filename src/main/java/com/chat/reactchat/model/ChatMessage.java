@@ -28,12 +28,8 @@ public class ChatMessage {
 
     private LocalDateTime dateCreation;
 
-    @PrePersist
-    private void init() {
-        dateCreation = LocalDateTime.now();
-    }
-
     public ChatMessage(String message, User sender, ChatRoom room){
+        this.dateCreation = LocalDateTime.now();
         this.message = message;
         this.sender = sender;
         this.room = room;

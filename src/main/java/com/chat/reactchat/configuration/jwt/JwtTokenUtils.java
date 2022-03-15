@@ -1,40 +1,34 @@
 package com.chat.reactchat.configuration.jwt;
 
+import com.chat.reactchat.configuration.properties.JwtTokenProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtTokenUtils {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtTokenProperties properties;
 
-    @Value("${jwt.lifetime}")
-    private long jwtLifetime;
+    private final SecretKeySpec key;
 
-    private SecretKeySpec key;
-
-    @PostConstruct
-    protected void init() {
-        String encodedKey = Base64.getEncoder().encodeToString(jwtSecret.getBytes());
-        key = new SecretKeySpec(encodedKey.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+    public JwtTokenUtils(JwtTokenProperties properties) {
+        this.properties = properties;
+        String encodedKey = Base64.getEncoder().encodeToString(properties.getSecret().getBytes());
+        this.key = new SecretKeySpec(encodedKey.getBytes(), SignatureAlgorithm.HS256.getJcaName());
     }
 
-    public String generateJwtToken(String email) {
+    public String generateJwtToken(Long id) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(id.toString())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtLifetime))
+                .setExpiration(new Date((new Date()).getTime() + properties.getLifetime()))
                 .signWith(key).compact();
     }
 
@@ -49,11 +43,11 @@ public class JwtTokenUtils {
         return false;
     }
 
-    public String getUserNameFromJwtToken(String jwt) {
+    public String getIdFromJwtToken(String jwt) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody().getSubject();
     }
 
-    public String getToken(String rawToken){
+    public String getToken(String rawToken) {
         if (StringUtils.hasText(rawToken) && rawToken.startsWith("Bearer ")) {
             return rawToken.substring(7);
         }

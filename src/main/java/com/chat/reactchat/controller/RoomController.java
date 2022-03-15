@@ -33,7 +33,6 @@ public class RoomController {
 
     @GetMapping("/rooms")
     public Set<ChatRoom> getUserChatRooms(Principal principal){
-        User user = userService.findByEmail(principal.getName());
-        return user.getRooms();
+        return userService.findById(Long.parseLong(principal.getName())).getRooms();
     }
 }

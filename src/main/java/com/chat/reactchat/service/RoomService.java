@@ -27,7 +27,7 @@ public class RoomService {
         return addUsers(room, usersId);
     }
 
-    public ChatRoom addRoom(String email, CreateRoomRequest request) {
+    public ChatRoom addRoom(String userId, CreateRoomRequest request) {
         ChatRoom room = new ChatRoom();
         room.setName(request.getName());
         room.setRoomType(request.getRoomType());
@@ -42,6 +42,6 @@ public class RoomService {
     }
 
     public ChatRoom findRoomById(Long roomId) {
-        return roomRepository.findChatRoomById(roomId);
+        return roomRepository.findChatRoomByIdOrThrow(roomId);
     }
 }

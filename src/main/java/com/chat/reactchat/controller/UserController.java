@@ -32,6 +32,6 @@ public class UserController {
 
     @GetMapping("/user")
     public User getCurrentUser(Principal principal) {
-        return userService.findByEmail(principal.getName());
+        return userService.findById(Long.parseLong(principal.getName()));
     }
 }

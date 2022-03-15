@@ -8,13 +8,8 @@ import com.chat.reactchat.repository.MessageRepository;
 import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.aspectj.bridge.Message;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -25,13 +20,14 @@ public class MessageService {
 
     // сохранение в отдельной транзакции, так как сообщения пользователя подгружаются лениво
     @Transactional
-    public ChatMessage saveMessage(String email, Long roomId, String text) {
-        // валидировать участик комнаты этот пользователь или нет
-        User user = userRepository.findUserByEmail(email).get();
-        ChatRoom chatRoom = roomRepository.findById(roomId).get();
+    public ChatMessage saveMessage(String userId, Long roomId, String text) {
+        User user = userRepository.findUserByIdOrThrow(Long.parseLong(userId)); // стоит ли использовать entity manager
+        ChatRoom chatRoom = roomRepository.findChatRoomByIdOrThrow(roomId);
+        if (!user.getRooms().contains(chatRoom))
+            throw new IllegalArgumentException(); //TODO заменить ошибку
         ChatMessage message = new ChatMessage(text, user, chatRoom);
         user.getMessages().add(message);
-//        userRepository.save(user);  // не понятно стоит ли сохранять родительскую сущность или достаточно только дочерней
-        return messageRepository.save(message);
+        userRepository.save(user);  // не понятно стоит ли сохранять родительскую сущность или достаточно только дочерней
+        return message;
     }
 }

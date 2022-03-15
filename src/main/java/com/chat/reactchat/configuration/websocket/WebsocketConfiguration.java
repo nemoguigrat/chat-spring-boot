@@ -1,6 +1,7 @@
 package com.chat.reactchat.configuration.websocket;
 
 import com.chat.reactchat.service.WebsocketService;
+import com.chat.reactchat.service.WebsocketSessionStoreService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @AllArgsConstructor
 public class WebsocketConfiguration implements WebSocketConfigurer {
     private final WebsocketService websocketService;
+    private final WebsocketSessionStoreService sessionStore;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -22,7 +24,7 @@ public class WebsocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public ChatWebsocketHandler getChatWebSocketHandler(){
-        return new ChatWebsocketHandler(websocketService);
+        return new ChatWebsocketHandler(websocketService, sessionStore);
     }
 
 }
