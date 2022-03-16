@@ -19,12 +19,10 @@ public class JsonConverterUtil {
         objectMapper.setDateFormat(DateFormat.getDateTimeInstance());
     }
 
-    public TextMessageRequest parseTextMessage(TextMessage textMessage) throws JsonProcessingException {
-        TextMessageRequest messageRequest = objectMapper.readValue(textMessage.getPayload(), TextMessageRequest.class);
-        if (messageRequest.getRoom() == null || messageRequest.getMessage() == null) {
-            throw new IllegalArgumentException();
-        }
-        return messageRequest;
+    public <T> T parseTextMessage(TextMessage textMessage, Class<T> objectType) throws JsonProcessingException {
+        // TODO обработчик ошибок, для не корректных сообщений
+        return objectMapper.readValue(textMessage.getPayload(), objectType);
+
     }
 
     public String convert(Object serializable) throws JsonProcessingException {

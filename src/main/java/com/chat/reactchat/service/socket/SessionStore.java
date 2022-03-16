@@ -1,4 +1,4 @@
-package com.chat.reactchat.service;
+package com.chat.reactchat.service.socket;
 
 import com.chat.reactchat.model.User;
 import org.springframework.web.socket.WebSocketSession;

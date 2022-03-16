@@ -1,4 +1,4 @@
-package com.chat.reactchat.service;
+package com.chat.reactchat.service.socket;
 
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.repository.UserRepository;
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
-public class WebsocketSessionStoreService implements SessionStore{
+public class MemorySessionStoreService implements SessionStore{
     private final Map<User, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final UserRepository userRepository;
 

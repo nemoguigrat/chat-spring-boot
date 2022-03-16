@@ -1,7 +1,7 @@
 package com.chat.reactchat.configuration.websocket;
 
-import com.chat.reactchat.service.WebsocketService;
-import com.chat.reactchat.service.WebsocketSessionStoreService;
+import com.chat.reactchat.service.socket.WebsocketService;
+import com.chat.reactchat.service.socket.MemorySessionStoreService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -14,7 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @AllArgsConstructor
 public class ChatWebsocketHandler extends TextWebSocketHandler {
     private final WebsocketService websocketService;
-    private final WebsocketSessionStoreService sessionStore;
+    private final MemorySessionStoreService sessionStore;
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
