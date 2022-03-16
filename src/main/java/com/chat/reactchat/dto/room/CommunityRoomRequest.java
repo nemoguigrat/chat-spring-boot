@@ -8,8 +8,8 @@ import javax.persistence.Enumerated;
 import java.util.Set;
 
 @Data
-public class CreateRoomRequest {
+public class CommunityRoomRequest {
     private String name;
     private Set<Long> users;
-    private RoomType roomType;
+    // возможно потом добавлю модификаторы доступа к комнате (приватный, общий, по ссылке)
 }

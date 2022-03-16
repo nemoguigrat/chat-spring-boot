@@ -3,17 +3,18 @@ package com.chat.reactchat.service.util;
 import com.chat.reactchat.dto.message.TextMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 
 import java.io.Serializable;
 import java.text.DateFormat;
 
-@Service
-public class JsonConverterUtil {
+@Component
+public class JsonConverterUtils {
     private final ObjectMapper objectMapper;
 
-    public JsonConverterUtil() {
+    public JsonConverterUtils() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         objectMapper.setDateFormat(DateFormat.getDateTimeInstance());

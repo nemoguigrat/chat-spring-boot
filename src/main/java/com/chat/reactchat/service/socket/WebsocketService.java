@@ -5,7 +5,7 @@ import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.repository.UserRepository;
 import com.chat.reactchat.service.MessageService;
-import com.chat.reactchat.service.util.JsonConverterUtil;
+import com.chat.reactchat.service.util.JsonConverterUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +21,15 @@ public class WebsocketService {
     private final MessageService messageService;
     private final UserRepository userRepository;
     private final MemorySessionStoreService sessionStore;
-    private final JsonConverterUtil jsonConverterUtil;
+    private final JsonConverterUtils jsonConverterUtils;
 
 
     public void sendMessage(WebSocketSession session, TextMessage message) throws IOException {
-            TextMessageRequest messageRequest = jsonConverterUtil.parseTextMessage(message, TextMessageRequest.class);
+            TextMessageRequest messageRequest = jsonConverterUtils.parseTextMessage(message, TextMessageRequest.class);
             ChatMessage savedMessage = messageService.saveMessage(session.getPrincipal().getName(),
                     messageRequest.getRoom(), messageRequest.getMessage());
             //генеригует сообщение для отправки другим пользователям
-            TextMessage messageResponse = new TextMessage(jsonConverterUtil.convert(savedMessage));
+            TextMessage messageResponse = new TextMessage(jsonConverterUtils.convert(savedMessage));
              // получает пользователей из указанной комнаты
             Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
             // пробегается по пользователям из комнаты и вытаскивает их сессии

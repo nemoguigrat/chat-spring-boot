@@ -1,6 +1,6 @@
 package com.chat.reactchat.service;
 
-import com.chat.reactchat.dto.room.CreateRoomRequest;
+import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
@@ -10,6 +10,8 @@ import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -27,16 +29,26 @@ public class RoomService {
         return addUsers(room, usersId);
     }
 
-    public ChatRoom addRoom(String userId, CreateRoomRequest request) {
+    public ChatRoom createCommunityRoom(String userId, CommunityRoomRequest request) {
         ChatRoom room = new ChatRoom();
+        room.setRoomType(RoomType.COMMUNITY);
         room.setName(request.getName());
-        room.setRoomType(request.getRoomType());
+        room = roomRepository.save(room);
+        request.getUsers().add(Long.parseLong(userId));
         return addUsers(room, request.getUsers());
+    }
+
+    public ChatRoom createPersonalRoom(String userId, Long companionId) {
+        // добавить проверку, что такой комнаты не существует.
+        ChatRoom room = new ChatRoom();
+        room.setRoomType(RoomType.PERSONAL);
+        room = roomRepository.save(room);
+        return addUsers(room, new HashSet<>(Arrays.asList(Long.parseLong(userId), companionId)));
     }
 
     private ChatRoom addUsers(ChatRoom room, Set<Long> usersId){
         Set<User> users = userRepository.findUsersByIdIn(usersId);
-        users.forEach(x -> x.addUserInRoom(room));
+        users.forEach(user -> user.getRooms().add(room));
         userRepository.saveAll(users);
         return room;
     }

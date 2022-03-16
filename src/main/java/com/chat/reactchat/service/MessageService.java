@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MessageService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final MessageRepository messageRepository;
 
     // сохранение в отдельной транзакции, так как сообщения пользователя подгружаются лениво
     @Transactional

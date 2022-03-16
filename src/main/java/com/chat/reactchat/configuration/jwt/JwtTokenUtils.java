@@ -4,6 +4,7 @@ import com.chat.reactchat.configuration.properties.JwtTokenProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -13,6 +14,7 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
+@EnableConfigurationProperties(JwtTokenProperties.class)
 public class JwtTokenUtils {
     private final JwtTokenProperties properties;
 

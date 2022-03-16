@@ -1,8 +1,7 @@
 package com.chat.reactchat.controller;
 
 import com.chat.reactchat.model.ChatRoom;
-import com.chat.reactchat.model.User;
-import com.chat.reactchat.dto.room.CreateRoomRequest;
+import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.service.RoomService;
 import com.chat.reactchat.service.UserService;
 import lombok.AllArgsConstructor;
@@ -20,10 +19,16 @@ public class RoomController {
     private final RoomService roomService;
     private final UserService userService;
 
-    @PostMapping("/rooms")
+    @PostMapping("/community-rooms")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createRoom(Principal principal, @RequestBody CreateRoomRequest request){
-        roomService.addRoom(principal.getName(), request);
+    public void createCommunityRoom(Principal principal, @RequestBody CommunityRoomRequest request){
+        roomService.createCommunityRoom(principal.getName(), request);
+    }
+
+    @PostMapping("/personal-rooms/{userId}")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public void createPersonalRoom(Principal principal, @PathVariable Long userId){
+        roomService.createPersonalRoom(principal.getName(), userId);
     }
 
     @PostMapping("/{roomId}/members")
