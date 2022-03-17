@@ -8,6 +8,7 @@ import com.chat.reactchat.repository.MessageRepository;
 import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -30,18 +31,21 @@ public class RoomService {
     }
 
     public ChatRoom createCommunityRoom(String userId, CommunityRoomRequest request) {
-        ChatRoom room = new ChatRoom();
-        room.setRoomType(RoomType.COMMUNITY);
-        room.setName(request.getName());
+        ChatRoom room = new ChatRoom(request.getName(), RoomType.COMMUNITY);
         room = roomRepository.save(room);
         request.getUsers().add(Long.parseLong(userId));
         return addUsers(room, request.getUsers());
     }
 
     public ChatRoom createPersonalRoom(String userId, Long companionId) {
+        // попробую при создании команты генерировать уникальный код,
+        // токен из id создателя и пирглашенного с помощью какой то соли
+
         // добавить проверку, что такой комнаты не существует.
-        ChatRoom room = new ChatRoom();
-        room.setRoomType(RoomType.PERSONAL);
+        String hashCode = userId + " " + companionId; // в дальнейшем алгоритм кодирования строки и сравнения кодов
+        if (roomRepository.existsChatRoomsByName(hashCode))
+            throw new IllegalArgumentException(); // заменить ошибку
+        ChatRoom room = new ChatRoom(hashCode, RoomType.PERSONAL);
         room = roomRepository.save(room);
         return addUsers(room, new HashSet<>(Arrays.asList(Long.parseLong(userId), companionId)));
     }

@@ -2,6 +2,7 @@ package com.chat.reactchat.repository;
 
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
+import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.User;
 import org.springframework.data.repository.CrudRepository;
 
@@ -12,4 +13,6 @@ public interface RoomRepository extends CrudRepository<ChatRoom, Long> {
         // TODO Изменить ошибку
         return findById(id).orElseThrow(() -> new IllegalArgumentException());
     }
+
+    Boolean existsChatRoomsByName(String name);
 }

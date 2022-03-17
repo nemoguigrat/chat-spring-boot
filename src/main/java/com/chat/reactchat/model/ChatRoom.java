@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "rooms")
+@ToString
 public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,4 +35,9 @@ public class ChatRoom {
             CascadeType.MERGE
     })
     private Set<ChatMessage> messages = new HashSet<>();
+
+    public ChatRoom(String name, RoomType type){
+        this.name = name;
+        this.roomType = type;
+    }
 }
