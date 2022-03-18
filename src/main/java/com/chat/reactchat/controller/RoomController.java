@@ -1,5 +1,7 @@
 package com.chat.reactchat.controller;
 
+import com.chat.reactchat.dto.message.TextMessageResponse;
+import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.service.RoomService;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 
@@ -21,23 +24,28 @@ public class RoomController {
 
     @PostMapping("/community-rooms")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createCommunityRoom(Principal principal, @RequestBody CommunityRoomRequest request){
+    public void createCommunityRoom(Principal principal, @RequestBody CommunityRoomRequest request) {
         roomService.createCommunityRoom(principal.getName(), request);
     }
 
     @PostMapping("/personal-rooms/{userId}")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createPersonalRoom(Principal principal, @PathVariable Long userId){
+    public void createPersonalRoom(Principal principal, @PathVariable Long userId) {
         roomService.createPersonalRoom(principal.getName(), userId);
     }
 
     @PostMapping("/{roomId}/members")
-    public void addMembers(@RequestBody Set<Long> usersId, @PathVariable Long roomId){
+    public void addMembers(@RequestBody Set<Long> usersId, @PathVariable Long roomId) {
         roomService.inviteUsers(roomId, usersId);
     }
 
     @GetMapping("/rooms")
-    public Set<ChatRoom> getUserChatRooms(Principal principal){
-        return userService.findById(Long.parseLong(principal.getName())).getRooms();
+    public Set<ChatRoom> getUserChatRooms(Principal principal) {
+        return roomService.getUserChatRooms(Long.parseLong(principal.getName()));
+    }
+
+    @GetMapping("/messages/{roomId}")
+    public List<TextMessageResponse> getChatMessagesInRoom(Principal principal, @PathVariable Long roomId) {
+        return roomService.getRoomMessages(Long.parseLong(principal.getName()), roomId);
     }
 }

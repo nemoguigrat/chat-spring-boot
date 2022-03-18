@@ -18,6 +18,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Set<User> findUsersByIdIn(Set<Long> id);
 
+    Boolean existsUserByIdAndRooms_Id(Long userId, Long roomId);
+
     Boolean existsUserByEmail(String email);
 
     // не нашел других вариантов пока, с ленивой загрузкой тяжело :/

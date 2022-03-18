@@ -1,6 +1,8 @@
 package com.chat.reactchat.service;
 
+import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
+import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
@@ -11,9 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,6 +30,32 @@ public class RoomService {
 
         return addUsers(room, usersId);
     }
+
+    public List<TextMessageResponse> getRoomMessages(Long userId, Long roomId) {
+        if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
+            throw new IllegalArgumentException(); // выкинуть ошибку
+        List<ChatMessage> chatMessages = messageRepository.findChatMessagesByRoom_IdOrderByDateCreation(roomId);
+        return chatMessages.stream().map(TextMessageResponse::new).collect(Collectors.toList());
+    }
+
+
+    public Set<ChatRoom> getUserChatRooms(Long userId) {
+        User user = userRepository.findUserByIdOrThrow(userId);
+
+        // стоит передлать алгоритм, слишком много транзакций
+        Set<ChatRoom> chatRooms = user.getRooms();
+        for (ChatRoom chatRoom : chatRooms)
+            if (chatRoom.getRoomType() == RoomType.PERSONAL) {
+                String personalRoomName = "";
+
+                for (User member : chatRoom.getUsers())
+                    if (!member.getId().equals(userId))
+                        personalRoomName = member.getFirstName() + " " + member.getSecondName();
+                chatRoom.setName(personalRoomName);
+            }
+        return chatRooms;
+    }
+
 
     public ChatRoom createCommunityRoom(String userId, CommunityRoomRequest request) {
         ChatRoom room = new ChatRoom(request.getName(), RoomType.COMMUNITY);
