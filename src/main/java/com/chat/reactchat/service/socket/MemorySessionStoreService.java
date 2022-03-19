@@ -12,13 +12,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @AllArgsConstructor
 public class MemorySessionStoreService implements SessionStore{
-    private final Map<User, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final UserRepository userRepository;
 
     @Override
     public void connect(WebSocketSession session) {
-        User user = userRepository.findUserByIdOrThrow(Long.parseLong(session.getPrincipal().getName()));
-        sessions.put(user, session);
+        Long userId = Long.parseLong(session.getPrincipal().getName());
+//        if (!userRepository.existsUserById(userId))
+//            throw new IllegalArgumentException(); //Заменить ошибку
+        sessions.put(userId, session);
     }
 
     @Override
@@ -27,7 +29,7 @@ public class MemorySessionStoreService implements SessionStore{
     }
 
     @Override
-    public WebSocketSession getSession(User user) {
-        return sessions.getOrDefault(user, null);
+    public WebSocketSession getSession(Long userId) {
+        return sessions.getOrDefault(userId, null);
     }
 }

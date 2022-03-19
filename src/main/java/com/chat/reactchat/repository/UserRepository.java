@@ -22,9 +22,11 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Boolean existsUserByEmail(String email);
 
+    Boolean existsUserById(Long id);
+
     // не нашел других вариантов пока, с ленивой загрузкой тяжело :/
-    @Query(value = "select u from ChatRoom r left join r.users u where :room member of u.rooms")
-    Set<User> selectUsersFromRoom(@Param("room") ChatRoom roomId);
+    @Query(value = "select u.id from User u left join u.rooms r where :roomId = r.id")
+    Set<Long> selectUsersIdFromRoom(@Param("roomId") Long roomId);
 
     default User findUserByEmailOrThrow(String email) {
         return findUserByEmail(email).orElseThrow(() ->

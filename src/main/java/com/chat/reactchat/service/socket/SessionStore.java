@@ -11,5 +11,5 @@ public interface SessionStore {
 
     void disconnect(WebSocketSession session);
 
-    WebSocketSession getSession(User user);
+    WebSocketSession getSession(Long userId);
 }

@@ -20,7 +20,7 @@ import java.util.*;
 public class WebsocketService {
     private final MessageService messageService;
     private final UserRepository userRepository;
-    private final MemorySessionStoreService sessionStore;
+    private final SessionStore sessionStore;
     private final JsonConverterUtils jsonConverterUtils;
 
 
@@ -31,12 +31,12 @@ public class WebsocketService {
         TextMessage messageResponse = new TextMessage(jsonConverterUtils.convert(savedMessage));
 
          // получает пользователей из указанной комнаты
-        Set<User> usersInCurrentRoom = userRepository.selectUsersFromRoom(savedMessage.getRoom());
+        Set<Long> usersInCurrentRoom = userRepository.selectUsersIdFromRoom(messageRequest.getRoom());
         // пробегается по пользователям из комнаты и вытаскивает их сессии
-        for (User user : usersInCurrentRoom) {
-            WebSocketSession userSession = sessionStore.getSession(user);
+        for (Long userId : usersInCurrentRoom) {
+            WebSocketSession userSession = sessionStore.getSession(userId);
             // если это не та же самая сессия и пользователь участник группы, то отправляется сообщение
-            if (userSession != null && !session.equals(userSession)){
+            if (userSession != null){
                 // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
                 userSession.sendMessage(messageResponse); // пока только пересылка отправленного
             }
