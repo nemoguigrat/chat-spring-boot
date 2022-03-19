@@ -14,6 +14,7 @@ import java.util.Set;
 @Table(name = "rooms")
 @ToString
 public class ChatRoom {
+    //TODO добавить дату последнего сообщения в комнате.
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

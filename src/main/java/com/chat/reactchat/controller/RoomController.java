@@ -35,12 +35,12 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/members")
-    public void addMembers(@RequestBody Set<Long> usersId, @PathVariable Long roomId) {
-        roomService.inviteUsers(roomId, usersId);
+    public void addMembers(Principal principal, @RequestBody Set<Long> usersId, @PathVariable Long roomId) {
+        roomService.inviteUsers(Long.parseLong(principal.getName()), roomId, usersId);
     }
 
     @GetMapping("/rooms")
-    public Set<ChatRoom> getUserChatRooms(Principal principal) {
+    public List<ChatRoom> getUserChatRooms(Principal principal) {
         return roomService.getUserChatRooms(Long.parseLong(principal.getName()));
     }
 

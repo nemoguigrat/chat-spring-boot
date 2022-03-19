@@ -34,6 +34,7 @@ public class User {
     @Column(name = "is_active")
     private Boolean active;
 
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     @Column(name = "rooms")
     @ManyToMany(cascade = {

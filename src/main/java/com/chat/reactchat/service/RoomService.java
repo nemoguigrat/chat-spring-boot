@@ -12,6 +12,7 @@ import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,8 +24,10 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
 
-    public ChatRoom inviteUsers(Long chatId, Set<Long> usersId) {
-        ChatRoom room = findRoomById(chatId);
+    public ChatRoom inviteUsers(Long userId, Long roomId, Set<Long> usersId) {
+        if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
+            throw new IllegalArgumentException(); // выкинуть ошибку
+        ChatRoom room = findRoomById(roomId);
         if (room.getRoomType() == RoomType.PERSONAL)
             throw new IllegalArgumentException(); // выкинуть ошибку
 
@@ -39,27 +42,34 @@ public class RoomService {
     }
 
 
-    public Set<ChatRoom> getUserChatRooms(Long userId) {
+    public List<ChatRoom> getUserChatRooms(Long userId) {
         User user = userRepository.findUserByIdOrThrow(userId);
-
+        Map<Long, ChatRoom> companionIdPersonalRoom = new HashMap<>();
+        List<ChatRoom> rooms = new ArrayList<>();
         // стоит передлать алгоритм, слишком много транзакций
-        Set<ChatRoom> chatRooms = user.getRooms();
-        for (ChatRoom chatRoom : chatRooms)
+
+        Set<ChatRoom> userChatRooms = user.getRooms();
+        for (ChatRoom chatRoom : userChatRooms) {
             if (chatRoom.getRoomType() == RoomType.PERSONAL) {
-                String personalRoomName = "";
-
-                for (User member : chatRoom.getUsers())
-                    if (!member.getId().equals(userId))
-                        personalRoomName = member.getFirstName() + " " + member.getSecondName();
-                chatRoom.setName(personalRoomName);
+                String[] usersId = chatRoom.getName().split(" ");
+                String companionId = userId.toString().equals(usersId[0]) ? usersId[1] : usersId[0];
+                companionIdPersonalRoom.put(Long.parseLong(companionId), chatRoom);
+            } else {
+                rooms.add(chatRoom);
             }
-        return chatRooms;
+        }
+        Set<User> companions = userRepository.findUsersByIdIn(companionIdPersonalRoom.keySet());
+        for (User companion : companions){
+            ChatRoom currentRoom = companionIdPersonalRoom.get(companion.getId());
+            currentRoom.setName(companion.getFirstName() + " " + companion.getSecondName());
+            rooms.add(currentRoom);
+        }
+//        rooms.sort(); отсортировать по дате последнего сообщения
+        return rooms;
     }
-
 
     public ChatRoom createCommunityRoom(String userId, CommunityRoomRequest request) {
         ChatRoom room = new ChatRoom(request.getName(), RoomType.COMMUNITY);
-        room = roomRepository.save(room);
         request.getUsers().add(Long.parseLong(userId));
         return addUsers(room, request.getUsers());
     }
@@ -73,13 +83,14 @@ public class RoomService {
         if (roomRepository.existsChatRoomsByName(hashCode))
             throw new IllegalArgumentException(); // заменить ошибку
         ChatRoom room = new ChatRoom(hashCode, RoomType.PERSONAL);
-        room = roomRepository.save(room);
         return addUsers(room, new HashSet<>(Arrays.asList(Long.parseLong(userId), companionId)));
     }
 
-    private ChatRoom addUsers(ChatRoom room, Set<Long> usersId){
+    private ChatRoom addUsers(ChatRoom room, Set<Long> usersId) {
         Set<User> users = userRepository.findUsersByIdIn(usersId);
-        users.forEach(user -> user.getRooms().add(room));
+        if (users.size() < usersId.size())
+            throw new IllegalArgumentException(); //Заменить ошибку
+        users.forEach(user -> user.addUserInRoom(roomRepository.save(room)));
         userRepository.saveAll(users);
         return room;
     }
