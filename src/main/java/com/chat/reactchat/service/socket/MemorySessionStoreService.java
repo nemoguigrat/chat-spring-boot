@@ -13,13 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 public class MemorySessionStoreService implements SessionStore{
     private final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private final UserRepository userRepository;
 
     @Override
     public void connect(WebSocketSession session) {
         Long userId = Long.parseLong(session.getPrincipal().getName());
-//        if (!userRepository.existsUserById(userId))
-//            throw new IllegalArgumentException(); //Заменить ошибку
         sessions.put(userId, session);
     }
 
