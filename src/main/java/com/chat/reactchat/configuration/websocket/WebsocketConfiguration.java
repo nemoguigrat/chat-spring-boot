@@ -26,5 +26,4 @@ public class WebsocketConfiguration implements WebSocketConfigurer {
     public ChatWebsocketHandler getChatWebSocketHandler(){
         return new ChatWebsocketHandler(websocketService, sessionStore);
     }
-
 }

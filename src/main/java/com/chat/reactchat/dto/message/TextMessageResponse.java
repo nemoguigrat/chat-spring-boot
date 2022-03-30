@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class TextMessageResponse implements Serializable {
+    private Long id;
+    private Long senderId;
     private String message;
     private Long room;
     private String firstName;
@@ -18,7 +20,9 @@ public class TextMessageResponse implements Serializable {
     private String dateCreation;
 
     public TextMessageResponse(ChatMessage message) {
+        this.id = message.getId();
         User sender = message.getSender();
+        this.senderId = sender.getId();
         this.message = message.getMessage();
         this.room = message.getRoom().getId();
         this.firstName = sender.getFirstName();

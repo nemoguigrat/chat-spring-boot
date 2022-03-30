@@ -2,6 +2,7 @@ package com.chat.reactchat.configuration.jwt;
 
 import com.chat.reactchat.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 public class AuthJwtFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
@@ -23,7 +26,9 @@ public class AuthJwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            String jwt = parseJwt(request);
+            String jwt = request.getHeader("Upgrade") != null ?
+                    parseJwtFromParams(request) : parseJwtFromHeader(request);
+            // передавать токен в параметре плохая идея, но браузерный апи не поддерживает установку касномных заголовков.
             if (jwt != null && jwtTokenUtils.validateJwtToken(jwt)) {
                 String userId = jwtTokenUtils.getIdFromJwtToken(jwt);
 
@@ -43,8 +48,17 @@ public class AuthJwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String parseJwt(HttpServletRequest request) {
+    private String parseJwtFromHeader(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         return jwtTokenUtils.getToken(headerAuth);
+    }
+
+    private String parseJwtFromParams(HttpServletRequest request) {
+        Map<String, String[]> paramAuth = request.getParameterMap();
+        String[] token = paramAuth.getOrDefault("token", null);
+        if (token == null)
+            throw new IllegalArgumentException(); // заменить ошибку
+        log.warn(token.toString());
+        return token[0];
     }
 }
