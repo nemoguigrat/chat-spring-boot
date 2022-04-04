@@ -1,6 +1,7 @@
 package com.chat.reactchat.service.socket;
 
 import com.chat.reactchat.dto.message.TextMessageRequest;
+import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.repository.UserRepository;
@@ -28,7 +29,7 @@ public class WebsocketService {
         TextMessageRequest messageRequest = jsonConverterUtils.parseTextMessage(message, TextMessageRequest.class);
         ChatMessage savedMessage = messageService.saveMessage(session.getPrincipal().getName(),
                 messageRequest.getRoom(), messageRequest.getMessage());
-        TextMessage messageResponse = new TextMessage(jsonConverterUtils.convert(savedMessage));
+        TextMessage messageResponse = new TextMessage(jsonConverterUtils.convert(new TextMessageResponse(savedMessage)));
 
          // получает пользователей из указанной комнаты
         Set<Long> usersInCurrentRoom = userRepository.selectUsersIdFromRoom(messageRequest.getRoom());

@@ -30,7 +30,7 @@ public class UserController {
         return "User with email " + user.getEmail() + " successfully registered";
     }
 
-    @GetMapping("/user")
+    @GetMapping("/user") // сейчас разрешен для всех, нужно поправить
     public User getCurrentUser(Principal principal) {
         return userService.findById(Long.parseLong(principal.getName()));
     }

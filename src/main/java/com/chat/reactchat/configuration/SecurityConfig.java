@@ -6,6 +6,7 @@ import com.chat.reactchat.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -32,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenUtils jwtTokenUtils;
 
+    //TODO насторить пути для маршрутизации,react router работает не очень, нужна настройка
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable();
@@ -39,7 +41,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
         http.exceptionHandling();
         http.authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/index*", "/static/**", "/*.js", "/*.json", "/*.ico")
+                .permitAll()
+                .antMatchers("/api/auth/**").permitAll() // поправить и запретить запрос для получения пользователя
                 .anyRequest().authenticated();
         http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),
                 UsernamePasswordAuthenticationFilter.class);
