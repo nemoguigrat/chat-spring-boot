@@ -61,4 +61,9 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() ->
                 new UsernameNotFoundException("Пользователь: " + id + " не найден."));
     }
+
+    public Set<User> getUsers(String searchName) {
+        //TODO добавить поле с уникальным ником в базу данных, поиск либо по имени, либо по нику, если в начале запроса @
+        return userRepository.selectUsersByFullName(searchName);
+    }
 }

@@ -18,6 +18,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Set<User> findUsersByIdIn(Iterable<Long> id);
 
+    @Query(value = "select u from User u where concat(u.firstName, ' ', u.secondName) like %:name%")
+    Set<User> selectUsersByFullName(@Param("name") String name);
+
     Boolean existsUserByIdAndRooms_Id(Long userId, Long roomId);
 
     Boolean existsUserByEmail(String email);

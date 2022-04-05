@@ -24,7 +24,7 @@ const Rooms = (props) => {
   }
 
   const getUser = async() => {
-    let response = await axios.get(URL + 'api/auth/user', {headers: {Authorization: "Bearer " + token}})
+    let response = await axios.get(URL + 'api/user', {headers: {Authorization: "Bearer " + token}})
     setUser(response.data)
   }
 

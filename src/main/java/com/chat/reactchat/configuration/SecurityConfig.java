@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.GET,
                         "/index*", "/static/**", "/*.js", "/*.json", "/*.ico")
                 .permitAll()
-                .antMatchers("/api/auth/**").permitAll() // поправить и запретить запрос для получения пользователя
+                .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),
                 UsernamePasswordAuthenticationFilter.class);
