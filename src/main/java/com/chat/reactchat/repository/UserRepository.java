@@ -33,10 +33,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     default User findUserByEmailOrThrow(String email) {
         return findUserByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("Пользователь: " + email + " не найден."));
+                new UsernameNotFoundException("User: " + email + " not found."));
     }
 
     default User findUserByIdOrThrow(Long id) {
-        return findById(id).orElseThrow(() -> new UsernameNotFoundException("Пользователь: " + id + " не найден."));
+        return findById(id).orElseThrow(() -> new UsernameNotFoundException("User: " + id + " not found."));
     }
 }

@@ -1,6 +1,7 @@
 package com.chat.reactchat.service;
 
 import com.chat.reactchat.configuration.jwt.JwtTokenUtils;
+import com.chat.reactchat.exception.user.UserExistException;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.Role;
@@ -43,14 +44,12 @@ public class UserService {
     }
 
     public User singUp(RegistrationRequest request) throws IllegalArgumentException{
-        if (!userRepository.existsUserByEmail(request.getEmail())){
-            User user = new User(request.getEmail(), request.getFirstName(), request.getSecondName());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.getRole().add(Role.ROLE_USER);
-            return userRepository.save(user);
-        }
-        else
-            throw new IllegalArgumentException("this user exists");
+        if (userRepository.existsUserByEmail(request.getEmail()))
+            throw new UserExistException("User with email " + request.getEmail() + " already exists");
+        User user = new User(request.getEmail(), request.getFirstName(), request.getSecondName());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.getRole().add(Role.ROLE_USER);
+        return userRepository.save(user);
     }
 
     public User saveUser(User user){
@@ -59,7 +58,7 @@ public class UserService {
 
     public User findById(Long id){
         return userRepository.findById(id).orElseThrow(() ->
-                new UsernameNotFoundException("Пользователь: " + id + " не найден."));
+                new UsernameNotFoundException("User: " + id + " not found."));
     }
 
     public Set<User> getUsers(String searchName) {

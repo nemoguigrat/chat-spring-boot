@@ -25,25 +25,21 @@ public class AuthJwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        try {
-            String jwt = request.getHeader("Upgrade") != null ?
-                    parseJwtFromParams(request) : parseJwtFromHeader(request);
-            // передавать токен в параметре плохая идея, но браузерный апи не поддерживает установку касномных заголовков.
-            if (jwt != null && jwtTokenUtils.validateJwtToken(jwt)) {
-                String userId = jwtTokenUtils.getIdFromJwtToken(jwt);
+        String jwt = request.getHeader("Upgrade") != null ?
+                parseJwtFromParams(request) : parseJwtFromHeader(request);
+        // передавать токен в параметре плохая идея, но браузерный апи не поддерживает установку касномных заголовков.
+        if (jwt != null) {
+            String userId = jwtTokenUtils.getIdAndValidate(jwt);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-        }catch (Exception e) {
-            System.err.println(e);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         filterChain.doFilter(request, response);
     }
@@ -56,9 +52,6 @@ public class AuthJwtFilter extends OncePerRequestFilter {
     private String parseJwtFromParams(HttpServletRequest request) {
         Map<String, String[]> paramAuth = request.getParameterMap();
         String[] token = paramAuth.getOrDefault("token", null);
-        if (token == null)
-            throw new IllegalArgumentException(); // заменить ошибку
-        log.warn(token.toString());
-        return token[0];
+        return token == null ? null : token[0];
     }
 }

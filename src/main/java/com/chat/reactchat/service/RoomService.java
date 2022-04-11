@@ -2,6 +2,8 @@ package com.chat.reactchat.service;
 
 import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
+import com.chat.reactchat.exception.room.UnsupportedRoomActionException;
+import com.chat.reactchat.exception.room.UserRoomAccessException;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.RoomType;
 import com.chat.reactchat.model.ChatRoom;
@@ -26,17 +28,17 @@ public class RoomService {
 
     public ChatRoom inviteUsers(Long userId, Long roomId, Set<Long> usersId) {
         if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
-            throw new IllegalArgumentException(); // выкинуть ошибку
+            throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
         ChatRoom room = findRoomById(roomId);
         if (room.getRoomType() == RoomType.PERSONAL)
-            throw new IllegalArgumentException(); // выкинуть ошибку
+            throw new UnsupportedRoomActionException("Unsupported action for room " + roomId);
 
         return addUsers(room, usersId);
     }
 
     public List<TextMessageResponse> getRoomMessages(Long userId, Long roomId) {
         if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
-            throw new IllegalArgumentException(); // выкинуть ошибку
+            throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
         List<ChatMessage> chatMessages = messageRepository.findChatMessagesByRoom_IdOrderByDateCreation(roomId);
         return chatMessages.stream().map(TextMessageResponse::new).collect(Collectors.toList());
     }

@@ -1,6 +1,7 @@
 package com.chat.reactchat.service;
 
 
+import com.chat.reactchat.exception.room.UserRoomAccessException;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.User;
@@ -23,7 +24,7 @@ public class MessageService {
         User user = userRepository.findUserByIdOrThrow(Long.parseLong(userId)); // стоит ли использовать entity manager
         ChatRoom chatRoom = roomRepository.findChatRoomByIdOrThrow(roomId);
         if (!user.getRooms().contains(chatRoom))
-            throw new IllegalArgumentException(); //TODO заменить ошибку
+            throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
         ChatMessage message = new ChatMessage(text, user, chatRoom);
         user.getMessages().add(message);
         userRepository.save(user);  // не понятно стоит ли сохранять родительскую сущность или достаточно только дочерней

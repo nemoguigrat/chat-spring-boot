@@ -2,6 +2,7 @@ package com.chat.reactchat.configuration;
 
 import com.chat.reactchat.configuration.jwt.AuthJwtFilter;
 import com.chat.reactchat.configuration.jwt.JwtTokenUtils;
+import com.chat.reactchat.exception.ExceptionHandlerFilter;
 import com.chat.reactchat.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated();
+        http.addFilterBefore(new ExceptionHandlerFilter(getDefaultExceptionResolver()), LogoutFilter.class);
         http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),
                 UsernamePasswordAuthenticationFilter.class);
     }
@@ -66,6 +72,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(8);
+    }
+
+    @Bean
+    public ExceptionHandlerExceptionResolver getDefaultExceptionResolver() {
+        return new ExceptionHandlerExceptionResolver();
     }
 
     @Bean

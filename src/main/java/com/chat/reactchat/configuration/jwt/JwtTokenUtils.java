@@ -1,9 +1,7 @@
 package com.chat.reactchat.configuration.jwt;
 
 import com.chat.reactchat.configuration.properties.JwtTokenProperties;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -39,14 +37,14 @@ public class JwtTokenUtils {
             //TODO проверка времени жизни токена. сейчас токен не ограничен
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
             return true;
-        } catch (MalformedJwtException | IllegalArgumentException e) {
+        } catch (MalformedJwtException | IllegalArgumentException | ExpiredJwtException | UnsupportedJwtException e) {
             System.err.println(e.getMessage());
         }
 
         return false;
     }
 
-    public String getIdFromJwtToken(String jwt) {
+    public String getIdAndValidate(String jwt) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody().getSubject();
     }
 

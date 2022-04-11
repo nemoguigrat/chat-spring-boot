@@ -1,5 +1,6 @@
 package com.chat.reactchat.repository;
 
+import com.chat.reactchat.exception.room.RoomNotFoundException;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.model.RoomType;
@@ -10,8 +11,7 @@ import java.util.Set;
 
 public interface RoomRepository extends CrudRepository<ChatRoom, Long> {
     default ChatRoom findChatRoomByIdOrThrow(Long id) {
-        // TODO Изменить ошибку
-        return findById(id).orElseThrow(() -> new IllegalArgumentException());
+        return findById(id).orElseThrow(() -> new RoomNotFoundException("Room " + id + " not found"));
     }
 
     Boolean existsChatRoomsByName(String name);
