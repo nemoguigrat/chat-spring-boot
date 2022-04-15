@@ -46,12 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
         http.exceptionHandling();
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers(
-                        HttpMethod.GET,
-                        "/index*", "/static/**", "/*.js", "/*.json", "/*.ico")
-                .permitAll()
+                .antMatchers("/", "/login", "/register").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/index*", "/static/**", "/*.js", "/*.json", "/*.ico").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new ExceptionHandlerFilter(getDefaultExceptionResolver()), LogoutFilter.class);
         http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),

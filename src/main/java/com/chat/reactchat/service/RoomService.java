@@ -48,7 +48,6 @@ public class RoomService {
         User user = userRepository.findUserByIdOrThrow(userId);
         Map<Long, ChatRoom> companionIdPersonalRoom = new HashMap<>();
         List<ChatRoom> rooms = new ArrayList<>();
-        // стоит передлать алгоритм, слишком много транзакций
 
         Set<ChatRoom> userChatRooms = user.getRooms();
         for (ChatRoom chatRoom : userChatRooms) {

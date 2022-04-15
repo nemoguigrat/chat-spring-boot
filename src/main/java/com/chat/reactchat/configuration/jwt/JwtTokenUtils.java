@@ -32,18 +32,6 @@ public class JwtTokenUtils {
                 .signWith(key).compact();
     }
 
-    public boolean validateJwtToken(String jwt) {
-        try {
-            //TODO проверка времени жизни токена. сейчас токен не ограничен
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
-            return true;
-        } catch (MalformedJwtException | IllegalArgumentException | ExpiredJwtException | UnsupportedJwtException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return false;
-    }
-
     public String getIdAndValidate(String jwt) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody().getSubject();
     }

@@ -12,13 +12,9 @@ import com.chat.reactchat.dto.auth.RegistrationRequest;
 import com.chat.reactchat.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -31,7 +27,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
 
-    public LoginResponse signIn(LoginRequest request){
+    public LoginResponse signIn(LoginRequest request) {
         User user = userRepository.findUserByEmailOrThrow(request.getEmail());
         String token = jwtTokenUtils.generateJwtToken(user.getId());
         return new LoginResponse(
@@ -43,7 +39,7 @@ public class UserService {
         );
     }
 
-    public User singUp(RegistrationRequest request) throws IllegalArgumentException{
+    public User singUp(RegistrationRequest request) throws IllegalArgumentException {
         if (userRepository.existsUserByEmail(request.getEmail()))
             throw new UserExistException("User with email " + request.getEmail() + " already exists");
         User user = new User(request.getEmail(), request.getFirstName(), request.getSecondName());
@@ -52,11 +48,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    public User findById(Long id){
+    public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new UsernameNotFoundException("User: " + id + " not found."));
     }
