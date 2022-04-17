@@ -25,6 +25,7 @@ const Rooms = (props) => {
 
   const getUser = async() => {
     let response = await axios.get(URL + 'api/user', {headers: {Authorization: "Bearer " + token}})
+        .catch((error) => error.response.status === 401 ? navigate('/login', {replace: true}) : console.log(error.response));
     setUser(response.data)
   }
 

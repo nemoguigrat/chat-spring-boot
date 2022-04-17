@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,8 @@ public class FilterExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(converterUtils.convert(error));
     }
 
-    @ExceptionHandler({MalformedJwtException.class, UnsupportedJwtException.class, ExpiredJwtException.class})
+    @ExceptionHandler({MalformedJwtException.class, UnsupportedJwtException.class, ExpiredJwtException.class,
+            SignatureException.class})
     public @ResponseBody ResponseEntity<String> handleInvalidJwt(RuntimeException ex, WebRequest request)
             throws JsonProcessingException {
         log.error(ex.getMessage());
