@@ -14,5 +14,5 @@ public interface RoomRepository extends CrudRepository<ChatRoom, Long> {
         return findById(id).orElseThrow(() -> new RoomNotFoundException("Room " + id + " not found"));
     }
 
-    Boolean existsChatRoomsByName(String name);
+    Boolean existsChatRoomsByNameOrName(String name, String alternate);
 }

@@ -18,7 +18,7 @@ const Login = (props) => {
       email: login,
       password: password
     });
-    if (response.status == 200){
+    if (response.status === 200){
       setToken(response.data.token);
       localStorage.setItem("token", response.data.token)
     }

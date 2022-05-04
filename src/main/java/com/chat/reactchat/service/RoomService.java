@@ -76,12 +76,10 @@ public class RoomService {
     }
 
     public ChatRoom createPersonalRoom(String userId, Long companionId) {
-        // попробую при создании команты генерировать уникальный код,
-        // токен из id создателя и пирглашенного с помощью какой то соли
-
-        // добавить проверку, что такой комнаты не существует.
+        //TODO проверка не осуществляется, тк. может существовать 2 комнаты, если собеседник тоже захочет создать команту
+        // то проверка по имени не сработает
         String hashCode = userId + " " + companionId; // в дальнейшем алгоритм кодирования строки и сравнения кодов
-        if (roomRepository.existsChatRoomsByName(hashCode))
+        if (roomRepository.existsChatRoomsByNameOrName(hashCode, companionId + " " + userId))
             throw new IllegalArgumentException(); // заменить ошибку
         ChatRoom room = new ChatRoom(hashCode, RoomType.PERSONAL);
         return addUsers(room, new HashSet<>(Arrays.asList(Long.parseLong(userId), companionId)));

@@ -4,6 +4,9 @@ import Login from './screens/Login';
 import Rooms from './screens/Rooms';
 import Registration from './screens/Registration';
 import { Context } from './components/Context';
+import Modal from 'react-modal'
+
+Modal.setAppElement('#root')
 
 const App = () => {
     const [token, setToken] = useState("");

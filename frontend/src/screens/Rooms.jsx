@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Context } from '../components/Context';
 import axios from 'axios';
 import "../styles/style.css"
+import Modal from "react-modal"
 
 const Rooms = (props) => {
   const [currentRoom, setCurrentRoom] = useState({});
@@ -67,8 +68,8 @@ const Rooms = (props) => {
   return (
     <div className='rooms interface'>
         <div className='chatapp'>
-          <Chats roomChange={current} currentRoom={currentRoom} user={user}/>
-          <Messages data={data} currentRoom={currentRoom} sendMessage={sendMessage} user={user}/>
+            <Chats roomChange={current} currentRoom={currentRoom} user={user}/>
+            <Messages data={data} currentRoom={currentRoom} sendMessage={sendMessage} user={user}/>
         </div>
     </div>
   )
