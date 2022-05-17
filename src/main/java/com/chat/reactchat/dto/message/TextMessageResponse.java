@@ -21,7 +21,7 @@ public class TextMessageResponse implements Serializable {
 
     public TextMessageResponse(ChatMessage message) {
         this.id = message.getId();
-        User sender = message.getSender();
+        User sender = message.getUser();
         this.senderId = sender.getId();
         this.message = message.getMessage();
         this.room = message.getRoom().getId();

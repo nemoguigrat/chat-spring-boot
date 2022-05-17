@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rooms-table
+      author: NikitaIvanov
+      changes:
+        - createTable:
+            tableName: rooms
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: room_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: users_rooms
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    references: users(id)
+                    foreignKeyName: fk_usersRoom_users
+                    nullable: false
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    references: rooms(id)
+                    foreignKeyName: fk_usersRoom_rooms
+                    nullable: false

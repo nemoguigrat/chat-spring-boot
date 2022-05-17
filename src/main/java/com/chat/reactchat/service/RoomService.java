@@ -4,13 +4,11 @@ import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.exception.room.UnsupportedRoomActionException;
 import com.chat.reactchat.exception.room.UserRoomAccessException;
-import com.chat.reactchat.model.ChatMessage;
-import com.chat.reactchat.model.RoomType;
-import com.chat.reactchat.model.ChatRoom;
-import com.chat.reactchat.model.User;
+import com.chat.reactchat.model.*;
 import com.chat.reactchat.repository.MessageRepository;
 import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.repository.UserRepository;
+import com.chat.reactchat.repository.UserRoomEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -25,9 +23,10 @@ public class RoomService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
+    private final UserRoomEntityRepository userRoomEntityRepository;
 
     public ChatRoom inviteUsers(Long userId, Long roomId, Set<Long> usersId) {
-        if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
+        if (!userRoomEntityRepository.existsById_UserIdAndId_RoomId(userId, roomId))
             throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
         ChatRoom room = findRoomById(roomId);
         if (room.getRoomType() == RoomType.PERSONAL)
@@ -37,7 +36,7 @@ public class RoomService {
     }
 
     public List<TextMessageResponse> getRoomMessages(Long userId, Long roomId) {
-        if (!userRepository.existsUserByIdAndRooms_Id(userId, roomId))
+        if (!userRoomEntityRepository.existsById_UserIdAndId_RoomId(userId, roomId))
             throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
         List<ChatMessage> chatMessages = messageRepository.findChatMessagesByRoom_IdOrderByDateCreation(roomId);
         return chatMessages.stream().map(TextMessageResponse::new).collect(Collectors.toList());
@@ -89,8 +88,15 @@ public class RoomService {
         Set<User> users = userRepository.findUsersByIdIn(usersId);
         if (users.size() < usersId.size())
             throw new IllegalArgumentException(); //Заменить ошибку
-        users.forEach(user -> user.addUserInRoom(roomRepository.save(room)));
-        userRepository.saveAll(users);
+        Set<UserRoomEntity> userRoomEntities = new HashSet<>();
+        room = roomRepository.save(room);
+        for (User user : users) {
+            UserRoomEntity entity = new UserRoomEntity(new UserRoomsKey(user.getId(), room.getId()));
+            entity.setUser(user);
+            entity.setRoom(room);
+            userRoomEntities.add(entity);
+        }
+        userRoomEntityRepository.saveAll(userRoomEntities);
         return room;
     }
 

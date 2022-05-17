@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: constraints-users-rooms-pk
+      author: NikitaIvanov
+      changes:
+        - addPrimaryKey:
+            columnNames: user_id, room_id
+            tableName: users_rooms

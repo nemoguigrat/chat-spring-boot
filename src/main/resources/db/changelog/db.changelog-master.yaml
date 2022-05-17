@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-users-table.yaml
+  - include:
+      file: db/changelog/changeset/create-rooms-table.yaml
+  - include:
+      file: db/changelog/changeset/create-messages-table.yaml
+  - include:
+      file: db/changelog/changeset/constraints-users-rooms-pk.yaml

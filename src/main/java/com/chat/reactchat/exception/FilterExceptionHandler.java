@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +29,8 @@ public class FilterExceptionHandler {
             throws JsonProcessingException {
         log.error(ex.getMessage());
         ApiErrorDto error = new ApiErrorDto(HttpStatus.NOT_FOUND, ex, request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(converterUtils.convert(error));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON).body(converterUtils.convert(error));
     }
 
     @ExceptionHandler({MalformedJwtException.class, UnsupportedJwtException.class, ExpiredJwtException.class,
@@ -37,6 +39,7 @@ public class FilterExceptionHandler {
             throws JsonProcessingException {
         log.error(ex.getMessage());
         ApiErrorDto error = new ApiErrorDto(HttpStatus.UNAUTHORIZED, ex, request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(converterUtils.convert(error));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON).body(converterUtils.convert(error));
     }
 }

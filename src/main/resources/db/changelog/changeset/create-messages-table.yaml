@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-messages-table
+      author: NikitaIvanov
+      changes:
+        - createTable:
+            tableName: messages
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: date_creation
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: room_id
+                  type: BIGINT
+                  constraints:
+                    references: rooms(id)
+                    foreignKeyName: fk_messages_rooms
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    references: users(id)
+                    foreignKeyName: fk_messages_users
+                    nullable: false

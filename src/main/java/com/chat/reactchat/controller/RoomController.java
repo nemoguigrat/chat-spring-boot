@@ -4,10 +4,14 @@ import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
+import com.chat.reactchat.model.UserRoomEntity;
+import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.service.RoomService;
 import com.chat.reactchat.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -18,9 +22,11 @@ import java.util.Set;
 @RestController
 @RequestMapping("api/chat")
 @AllArgsConstructor
+@Slf4j
 public class RoomController {
     private final RoomService roomService;
     private final UserService userService;
+    private final RoomRepository roomRepository;
 
     @PostMapping("/community-rooms")
     @ResponseStatus(value = HttpStatus.CREATED)

@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "first_name")
@@ -36,7 +36,6 @@ public class User {
 
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    @Column(name = "rooms")
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
@@ -49,7 +48,7 @@ public class User {
 
     @EqualsAndHashCode.Exclude
     @JsonIgnore
-    @OneToMany(mappedBy = "sender", cascade = {
+    @OneToMany(mappedBy = "user", cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
     })
