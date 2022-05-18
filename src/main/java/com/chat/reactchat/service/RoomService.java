@@ -2,6 +2,7 @@ package com.chat.reactchat.service;
 
 import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
+import com.chat.reactchat.dto.room.RoomDto;
 import com.chat.reactchat.exception.room.UnsupportedRoomActionException;
 import com.chat.reactchat.exception.room.UserRoomAccessException;
 import com.chat.reactchat.model.*;
@@ -10,7 +11,6 @@ import com.chat.reactchat.repository.RoomRepository;
 import com.chat.reactchat.repository.UserRepository;
 import com.chat.reactchat.repository.UserRoomEntityRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +28,7 @@ public class RoomService {
     public ChatRoom inviteUsers(Long userId, Long roomId, Set<Long> usersId) {
         if (!userRoomEntityRepository.existsById_UserIdAndId_RoomId(userId, roomId))
             throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
-        ChatRoom room = findRoomById(roomId);
+        ChatRoom room = roomRepository.findChatRoomByIdOrThrow(roomId);
         if (room.getRoomType() == RoomType.PERSONAL)
             throw new UnsupportedRoomActionException("Unsupported action for room " + roomId);
 
@@ -42,11 +42,11 @@ public class RoomService {
         return chatMessages.stream().map(TextMessageResponse::new).collect(Collectors.toList());
     }
 
-
-    public List<ChatRoom> getUserChatRooms(Long userId) {
+    @Transactional
+    public List<RoomDto> getUserChatRooms(Long userId) {
         User user = userRepository.findUserByIdOrThrow(userId);
         Map<Long, ChatRoom> companionIdPersonalRoom = new HashMap<>();
-        List<ChatRoom> rooms = new ArrayList<>();
+        List<RoomDto> rooms = new ArrayList<>();
 
         Set<ChatRoom> userChatRooms = user.getRooms();
         for (ChatRoom chatRoom : userChatRooms) {
@@ -55,14 +55,15 @@ public class RoomService {
                 String companionId = userId.toString().equals(usersId[0]) ? usersId[1] : usersId[0];
                 companionIdPersonalRoom.put(Long.parseLong(companionId), chatRoom);
             } else {
-                rooms.add(chatRoom);
+                rooms.add(new RoomDto(chatRoom));
             }
         }
         Set<User> companions = userRepository.findUsersByIdIn(companionIdPersonalRoom.keySet());
         for (User companion : companions){
             ChatRoom currentRoom = companionIdPersonalRoom.get(companion.getId());
-            currentRoom.setName(companion.getFirstName() + " " + companion.getSecondName());
-            rooms.add(currentRoom);
+            RoomDto roomDto = new RoomDto(currentRoom);
+            roomDto.setName(companion.getFirstName() + " " + companion.getSecondName());
+            rooms.add(roomDto);
         }
 //        rooms.sort(); отсортировать по дате последнего сообщения
         return rooms;
@@ -89,18 +90,15 @@ public class RoomService {
         if (users.size() < usersId.size())
             throw new IllegalArgumentException(); //Заменить ошибку
         Set<UserRoomEntity> userRoomEntities = new HashSet<>();
-        room = roomRepository.save(room);
+        if (room.getId() == null)
+            room = roomRepository.save(room);
         for (User user : users) {
-            UserRoomEntity entity = new UserRoomEntity(new UserRoomsKey(user.getId(), room.getId()));
+            UserRoomEntity entity = new UserRoomEntity();
             entity.setUser(user);
             entity.setRoom(room);
             userRoomEntities.add(entity);
         }
         userRoomEntityRepository.saveAll(userRoomEntities);
         return room;
-    }
-
-    public ChatRoom findRoomById(Long roomId) {
-        return roomRepository.findChatRoomByIdOrThrow(roomId);
     }
 }

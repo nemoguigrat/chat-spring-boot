@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class UserRoomEntity {
     @EmbeddedId
-    private UserRoomsKey id;
+    private UserRoomsKey id = new UserRoomsKey();
 
     @ManyToOne
     @MapsId("userId")

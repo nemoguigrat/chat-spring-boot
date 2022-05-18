@@ -1,6 +1,7 @@
 package com.chat.reactchat.controller;
 
 import com.chat.reactchat.dto.message.TextMessageResponse;
+import com.chat.reactchat.dto.room.RoomDto;
 import com.chat.reactchat.model.ChatMessage;
 import com.chat.reactchat.model.ChatRoom;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
@@ -46,7 +47,7 @@ public class RoomController {
     }
 
     @GetMapping("/rooms")
-    public List<ChatRoom> getUserChatRooms(Principal principal) {
+    public List<RoomDto> getUserChatRooms(Principal principal) {
         return roomService.getUserChatRooms(Long.parseLong(principal.getName()));
     }
 
