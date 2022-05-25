@@ -1,5 +1,6 @@
 package com.chat.reactchat.controller;
 
+import com.chat.reactchat.model.CustomUserDetails;
 import com.chat.reactchat.model.User;
 import com.chat.reactchat.dto.auth.LoginRequest;
 import com.chat.reactchat.dto.auth.LoginResponse;
@@ -8,6 +9,7 @@ import com.chat.reactchat.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -32,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public User getCurrentUser(Principal principal) {
-        return userService.findById(Long.parseLong(principal.getName()));
+    public User getCurrentUser(@AuthenticationPrincipal CustomUserDetails principal) {
+        return userService.findById(principal.getId());
     }
 
     @GetMapping("/users")

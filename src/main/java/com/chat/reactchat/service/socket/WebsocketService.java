@@ -38,7 +38,6 @@ public class WebsocketService {
             WebSocketSession userSession = sessionStore.getSession(userId);
             // если это не та же самая сессия и пользователь участник группы, то отправляется сообщение
             if (userSession != null){
-                // TODO создать Dto с короткими данными пользователя, комнатой, самим сообщением + дополнительная информация о сообщении
                 userSession.sendMessage(messageResponse); // пока только пересылка отправленного
             }
         }

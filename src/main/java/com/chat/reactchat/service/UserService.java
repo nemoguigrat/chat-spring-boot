@@ -22,9 +22,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
 
     public LoginResponse signIn(LoginRequest request) {

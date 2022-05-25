@@ -1,6 +1,7 @@
 package com.chat.reactchat.exception;
 
 import com.chat.reactchat.exception.dto.ApiErrorDto;
+import com.chat.reactchat.exception.room.RoomExistsException;
 import com.chat.reactchat.exception.room.RoomNotFoundException;
 import com.chat.reactchat.exception.room.UnsupportedRoomActionException;
 import com.chat.reactchat.exception.room.UserRoomAccessException;
@@ -34,6 +35,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 error,
                 new HttpHeaders(),
                 HttpStatus.FORBIDDEN,
+                request);
+    }
+
+    @ExceptionHandler(RoomExistsException.class)
+    public ResponseEntity<Object> handleRoomExists(RuntimeException ex, WebRequest request) {
+        ApiErrorDto error = new ApiErrorDto(HttpStatus.CONFLICT, ex, request.getDescription(false));
+        return handleExceptionInternal(ex,
+                error,
+                new HttpHeaders(),
+                HttpStatus.CONFLICT,
                 request);
     }
 

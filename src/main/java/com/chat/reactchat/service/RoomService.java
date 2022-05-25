@@ -3,6 +3,7 @@ package com.chat.reactchat.service;
 import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.dto.room.RoomDto;
+import com.chat.reactchat.exception.room.RoomExistsException;
 import com.chat.reactchat.exception.room.UnsupportedRoomActionException;
 import com.chat.reactchat.exception.room.UserRoomAccessException;
 import com.chat.reactchat.model.*;
@@ -69,20 +70,18 @@ public class RoomService {
         return rooms;
     }
 
-    public ChatRoom createCommunityRoom(String userId, CommunityRoomRequest request) {
+    public ChatRoom createCommunityRoom(Long userId, CommunityRoomRequest request) {
         ChatRoom room = new ChatRoom(request.getName(), RoomType.COMMUNITY);
-        request.getUsers().add(Long.parseLong(userId));
+        request.getUsers().add(userId);
         return addUsers(room, request.getUsers());
     }
 
-    public ChatRoom createPersonalRoom(String userId, Long companionId) {
-        //TODO проверка не осуществляется, тк. может существовать 2 комнаты, если собеседник тоже захочет создать команту
-        // то проверка по имени не сработает
-        String hashCode = userId + " " + companionId; // в дальнейшем алгоритм кодирования строки и сравнения кодов
+    public ChatRoom createPersonalRoom(Long userId, Long companionId) {
+        String hashCode = userId + " " + companionId;
         if (roomRepository.existsChatRoomsByNameOrName(hashCode, companionId + " " + userId))
-            throw new IllegalArgumentException(); // заменить ошибку
+            throw new RoomExistsException();
         ChatRoom room = new ChatRoom(hashCode, RoomType.PERSONAL);
-        return addUsers(room, new HashSet<>(Arrays.asList(Long.parseLong(userId), companionId)));
+        return addUsers(room, new HashSet<>(Arrays.asList(userId, companionId)));
     }
 
     private ChatRoom addUsers(ChatRoom room, Set<Long> usersId) {
