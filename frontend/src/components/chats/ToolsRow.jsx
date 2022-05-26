@@ -4,6 +4,7 @@ import Modal from "react-modal";
 import axios from "axios";
 import {URL} from "../../const";
 import {Context} from "../Context";
+import {useNavigate} from "react-router-dom"
 
 const ToolsRow = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -12,8 +13,14 @@ const ToolsRow = () => {
     const [selectedForCommunity, setSelectedCommunity] = useState([]);
     const [selectedPersonal, setSelectedPersonal] = useState({});
     const [searchedUsers, setSearchedUsers] = useState([]);
+    const navigate = useNavigate();
 
-    const handleViewModal = () => setIsOpen(!isOpen)
+    const handleViewModal = () => setIsOpen(!isOpen);
+
+    const exit = () => {
+        localStorage.removeItem("token");
+        navigate('/login', {replace: true})
+    }
 
     const getUsers = async(event) => {
         let resp = await axios.get(URL + "api/users",
@@ -111,6 +118,7 @@ const ToolsRow = () => {
             </Modal>
 
             <input type="button" value="+" onClick={handleViewModal}/>
+            <input type="button" value="->" onClick={exit}/>
         </div>
     )
 }

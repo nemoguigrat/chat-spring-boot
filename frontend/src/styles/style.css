@@ -48,6 +48,11 @@ body {
     width: 80%;
 }
 
+.noMessagesText {
+    color: white;
+    text-align: center;
+}
+
 .chatBorder {
     border-right: 3px inset black;
 }
