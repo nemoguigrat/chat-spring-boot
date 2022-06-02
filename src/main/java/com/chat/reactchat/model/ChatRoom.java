@@ -26,6 +26,10 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "rooms")
     private Set<User> users = new HashSet<>();

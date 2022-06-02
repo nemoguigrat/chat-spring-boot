@@ -11,7 +11,8 @@ const ChatRow = ({currentRoom, room, roomChange}) => {
 
   return (
     <div className={rowStyle()} onClick={() => roomChange(room)}>
-      <div className='chatImage'></div>
+      {room.image != null ? <img className='chatImage' src={room.image.filename} alt="" /> :
+          <div className='chatImage chatImagePlaceholder'/>}
       <p className='rowText'>{room.id} {room.name}</p>
     </div>
   )

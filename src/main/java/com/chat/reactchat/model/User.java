@@ -34,6 +34,10 @@ public class User {
     @Column(name = "is_active")
     private Boolean active;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ManyToMany(cascade = {
@@ -64,10 +68,5 @@ public class User {
         this.firstName = firstName;
         this.secondName = secondName;
         this.active = true;
-    }
-
-    public void addUserInRoom(ChatRoom room){
-        this.rooms.add(room);
-        room.getUsers().add(this);
     }
 }

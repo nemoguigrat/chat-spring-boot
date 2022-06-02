@@ -1,5 +1,6 @@
 package com.chat.reactchat.service;
 
+import com.chat.reactchat.dto.file.UploadFileResponse;
 import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.dto.room.RoomDto;
@@ -14,6 +15,7 @@ import com.chat.reactchat.repository.UserRoomEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
     private final UserRoomEntityRepository userRoomEntityRepository;
+    private final FileStorageService fileStorageService;
 
     public ChatRoom inviteUsers(Long userId, Long roomId, Set<Long> usersId) {
         if (!userRoomEntityRepository.existsById_UserIdAndId_RoomId(userId, roomId))
@@ -34,6 +37,17 @@ public class RoomService {
             throw new UnsupportedRoomActionException("Unsupported action for room " + roomId);
 
         return addUsers(room, usersId);
+    }
+
+    @Transactional
+    public void loadImage(Long userId, Long roomId, MultipartFile file) {
+        if (!userRoomEntityRepository.existsById_UserIdAndId_RoomId(userId, roomId))
+            throw new UserRoomAccessException("User not a room member " + roomId + " or not exist.");
+        String fileName = fileStorageService.storeFile(file);
+        Image image = new Image(fileName);
+        ChatRoom room = roomRepository.findChatRoomByIdOrThrow(roomId);
+        room.setImage(image);
+        roomRepository.save(room);
     }
 
     public List<TextMessageResponse> getRoomMessages(Long userId, Long roomId) {

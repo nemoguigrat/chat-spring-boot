@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/changeset/create-messages-table.yaml
   - include:
       file: db/changelog/changeset/constraints-users-rooms-pk.yaml
+  - include:
+      file: db/changelog/changeset/constraints-image-table.yaml

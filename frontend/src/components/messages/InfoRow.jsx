@@ -4,7 +4,8 @@ import '../../styles/style.css'
 const InfoRow = (props) => {
   return (
     <div className='infoRow interface profileBorder'>
-      <div className='chatImage'></div>
+        {props.currentRoom.image != null ? <img className='chatImage' src={props.currentRoom.image.filename} alt="" /> :
+            <div className='chatImage chatImagePlaceholder' />}
       <div className='rowText'>{props.currentRoom.name}</div>
     </div>
   )

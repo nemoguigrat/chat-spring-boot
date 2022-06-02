@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: constraints-image-table
+      author: NikitaIvanov
+      changes:
+        - createTable:
+            tableName: images
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: date_creation
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: filename
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: image_id
+                  type: BIGINT
+                  constraints:
+                    references: images(id)
+                    foreignKeyName: fk_users_images
+                    nullable: true
+        - addColumn:
+            tableName: rooms
+            columns:
+              - column:
+                  name: image_id
+                  type: BIGINT
+                  constraints:
+                    references: images(id)
+                    foreignKeyName: fk_rooms_images
+                    nullable: true

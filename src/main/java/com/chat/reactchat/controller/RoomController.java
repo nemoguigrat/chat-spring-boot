@@ -1,5 +1,6 @@
 package com.chat.reactchat.controller;
 
+import com.chat.reactchat.dto.file.UploadFileResponse;
 import com.chat.reactchat.dto.message.TextMessageResponse;
 import com.chat.reactchat.dto.room.CommunityRoomRequest;
 import com.chat.reactchat.dto.room.RoomDto;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -51,5 +53,12 @@ public class RoomController {
     public List<TextMessageResponse> getChatMessagesInRoom(@AuthenticationPrincipal CustomUserDetails principal,
                                                            @PathVariable Long roomId) {
         return roomService.getRoomMessages(principal.getId(), roomId);
+    }
+
+    @PostMapping("room/{roomId}/upload")
+    public void uploadFile(@AuthenticationPrincipal CustomUserDetails principal,
+                                         @RequestParam("file") MultipartFile file,
+                                         @PathVariable Long roomId) {
+        roomService.loadImage(principal.getId(), roomId, file);
     }
 }

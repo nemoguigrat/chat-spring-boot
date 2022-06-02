@@ -33,3 +33,4 @@ build/
 .vscode/
 frontend/build
 frontend/node_modules
+uploads/

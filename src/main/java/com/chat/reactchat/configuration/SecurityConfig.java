@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling();
         http.authorizeRequests()
                 .antMatchers("/", "/login", "/register").permitAll()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/**", "/api/downloadFile/**").permitAll()
                 .antMatchers("/index*", "/static/**", "/*.js", "/*.json", "/*.ico").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(new ExceptionHandlerFilter(getDefaultExceptionResolver()), LogoutFilter.class);
