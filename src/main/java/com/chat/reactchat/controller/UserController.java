@@ -10,11 +10,14 @@ import com.chat.reactchat.dto.auth.RegistrationRequest;
 import com.chat.reactchat.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.Set;
 
 @RestController
@@ -36,14 +39,15 @@ public class UserController {
     }
 
     @PostMapping("user/upload")
-    public void uploadFile(@AuthenticationPrincipal CustomUserDetails principal,
+    public void uploadFile(JwtAuthenticationToken principal,
                                          @RequestParam("file") MultipartFile file) {
-        userService.loadImage(principal.getId(), file);
+        userService.loadImage(Long.parseLong(principal.getName()), file);
     }
 
     @GetMapping("/user")
-    public UserResponse getCurrentUser(@AuthenticationPrincipal CustomUserDetails principal) {
-        return userService.getUserProfile(principal.getId());
+    public UserResponse getCurrentUser(JwtAuthenticationToken principal) {
+        log.error(principal.getAuthorities().toString());
+        return userService.getUserProfile(Long.parseLong(principal.getName()));
     }
 
     @GetMapping("/users")

@@ -11,7 +11,9 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @AllArgsConstructor
 @ConfigurationProperties(prefix = "jwt")
 public class JwtTokenProperties {
-    private final String secret;
+    private final String keystorePath;
+    private final String keystorePassword;
+    private final String keyAlias;
+    private final String privateKeyPassphrase;
 
-    private final Long lifetime;
 }

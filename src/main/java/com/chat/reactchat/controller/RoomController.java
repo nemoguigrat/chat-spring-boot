@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,39 +27,41 @@ public class RoomController {
 
     @PostMapping("/community-rooms")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createCommunityRoom(@AuthenticationPrincipal CustomUserDetails principal,
+    public void createCommunityRoom(JwtAuthenticationToken principal,
                                     @RequestBody CommunityRoomRequest request) {
-        roomService.createCommunityRoom(principal.getId(), request);
+        roomService.createCommunityRoom(Long.parseLong(principal.getName()), request);
     }
 
     @PostMapping("/personal-rooms/{userId}")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createPersonalRoom(@AuthenticationPrincipal CustomUserDetails principal,
+    public void createPersonalRoom(JwtAuthenticationToken principal,
                                    @PathVariable Long userId) {
-        roomService.createPersonalRoom(principal.getId(), userId);
+        roomService.createPersonalRoom(Long.parseLong(principal.getName()), userId);
     }
 
     @PostMapping("/{roomId}/members")
-    public void addMembers(@AuthenticationPrincipal CustomUserDetails principal,
+    public void addMembers(JwtAuthenticationToken principal,
                            @RequestBody Set<Long> usersId, @PathVariable Long roomId) {
-        roomService.inviteUsers(principal.getId(), roomId, usersId);
+        roomService.inviteUsers(Long.parseLong(principal.getName()), roomId, usersId);
     }
 
     @GetMapping("/rooms")
-    public List<RoomDto> getUserChatRooms(@AuthenticationPrincipal CustomUserDetails principal) {
-        return roomService.getUserChatRooms(principal.getId());
+    public List<RoomDto> getUserChatRooms(JwtAuthenticationToken principal) {
+        log.error(principal.getName());
+        return roomService.getUserChatRooms(Long.parseLong(principal.getName()));
     }
 
     @GetMapping("/messages/{roomId}")
-    public List<TextMessageResponse> getChatMessagesInRoom(@AuthenticationPrincipal CustomUserDetails principal,
+    public List<TextMessageResponse> getChatMessagesInRoom(JwtAuthenticationToken principal,
                                                            @PathVariable Long roomId) {
-        return roomService.getRoomMessages(principal.getId(), roomId);
+        log.error(principal.getName());
+        return roomService.getRoomMessages(Long.parseLong(principal.getName()), roomId);
     }
 
     @PostMapping("room/{roomId}/upload")
-    public void uploadFile(@AuthenticationPrincipal CustomUserDetails principal,
+    public void uploadFile(JwtAuthenticationToken principal,
                                          @RequestParam("file") MultipartFile file,
                                          @PathVariable Long roomId) {
-        roomService.loadImage(principal.getId(), roomId, file);
+        roomService.loadImage(Long.parseLong(principal.getName()), roomId, file);
     }
 }

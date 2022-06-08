@@ -27,7 +27,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Boolean existsUserById(Long id);
 
-    // не нашел других вариантов пока, с ленивой загрузкой тяжело :/
     @Query(value = "select u.id from User u left join u.rooms r where :roomId = r.id")
     Set<Long> selectUsersIdFromRoom(@Param("roomId") Long roomId);
 

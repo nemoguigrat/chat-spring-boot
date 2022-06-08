@@ -1,13 +1,9 @@
 package com.chat.reactchat.configuration;
 
-import com.chat.reactchat.configuration.jwt.AuthJwtFilter;
-import com.chat.reactchat.configuration.jwt.JwtTokenUtils;
-import com.chat.reactchat.exception.ExceptionHandlerFilter;
 import com.chat.reactchat.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,18 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
-import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +28,6 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -46,23 +37,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling();
         http.authorizeRequests()
                 .antMatchers("/", "/login", "/register").permitAll()
+                .antMatchers("/api/user").hasAuthority("ROLE_USER")
                 .antMatchers("/api/auth/**", "/api/downloadFile/**").permitAll()
                 .antMatchers("/index*", "/static/**", "/*.js", "/*.json", "/*.ico").permitAll()
                 .anyRequest().authenticated();
-        http.addFilterBefore(new ExceptionHandlerFilter(getDefaultExceptionResolver()), LogoutFilter.class);
-        http.addFilterBefore(new AuthJwtFilter(customUserDetailsService, jwtTokenUtils),
-                UsernamePasswordAuthenticationFilter.class);
+        http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
-    }
-
-    @Override
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+//    }
+//
+//    @Override
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter());
+        return converter;
+    }
+
+    @Bean
+    public JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthoritiesClaimName("authorities");
+        converter.setAuthorityPrefix("ROLE_");
+        return converter;
     }
 
     @Bean
@@ -70,11 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(8);
     }
 
-    @Bean
-    public ExceptionHandlerExceptionResolver getDefaultExceptionResolver() {
-        return new ExceptionHandlerExceptionResolver();
-    }
-
+    //настроить корс, он здесь нужен только для тестовой конфигурации
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
