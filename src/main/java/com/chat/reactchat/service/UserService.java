@@ -29,7 +29,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
     public LoginResponse signIn(LoginRequest request) {

@@ -32,15 +32,15 @@ const Rooms = (props) => {
 
   useEffect(() => {
     console.log(token + " " + 1)
-    if (token != "")
+    if (token !== "")
       getUser();
   }, [token])
 
   useEffect(() => {
-        if (token == "")
+        if (token === "")
           return;
         if (!isPaused) {
-            ws.current = new WebSocket(WEBSOCKET + "?token=" + token); // создаем ws соединение
+            ws.current = new WebSocket(WEBSOCKET + "?access_token=" + token); // создаем ws соединение
             ws.current.onopen = () => console.log("Соединение открыто");  // callback на ивент открытия соединения
             ws.current.onclose = () => console.log("Соединение закрыто"); // callback на ивент закрытия соединения
 
